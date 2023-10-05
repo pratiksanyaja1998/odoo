@@ -2,8 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': '10thSpire Theme',
-    'description': '10thSpire website theme',
+    'name': 'TenthSpire Business Theme',
+    'description': 'TenthSpire business website theme',
     'category': 'Theme',
     'sequence': 1000,
     'version': '1.0',
