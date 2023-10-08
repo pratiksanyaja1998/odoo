@@ -10,11 +10,12 @@ from odoo.addons.web.controllers.home import ensure_db, Home, SIGN_UP_REQUEST_PA
 from odoo.addons.base_setup.controllers.main import BaseSetup
 from odoo.exceptions import UserError
 from odoo.http import request
+from random import randint, randrange
 
 _logger = logging.getLogger(__name__)
 
 LOGIN_SUCCESSFUL_PARAMS.add('account_created')
-
+SIGN_UP_REQUEST_PARAMS.add('otp')
 
 class AuthSignupHome(Home):
 
@@ -32,6 +33,38 @@ class AuthSignupHome(Home):
                 return request.redirect_query('/web/login_successful', query={'account_created': True})
         return response
 
+    @http.route('/web/email-verification', type="http", auth="public", website=True, sitemap=False)
+    def web_otp_verification(self, *args, **kv):
+        # qcontext = request.params.items()
+        qcontext = {k: v for (k, v) in request.params.items() if k in SIGN_UP_REQUEST_PARAMS}
+
+        if request.httprequest.method == 'GET':
+            response = request.render('auth_signup.otp_verification', qcontext)
+            response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+            response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
+            return response
+
+        if request.httprequest.method == 'POST':
+            # TODO need to check OTP is valid
+            # DO login
+            # Redirect ..
+
+            User = request.env['res.users']
+            user_sudo = User.sudo().search(
+                User._get_login_domain(qcontext.get('login')), order=User._get_login_order(), limit=1
+            )
+            request.params['password'] = 'pratik1998'
+            return self.web_login(*args, **kv)
+
+            # pre_uid = request.session.authenticate(request.db, user_sudo.login, user_sudo.password)
+            # if not pre_uid:
+            #     raise SignupError(_('Authentication Failed.'))
+            #
+            #
+            # pass
+
+
+
     @http.route('/web/signup', type='http', auth='public', website=True, sitemap=False)
     def web_auth_signup(self, *args, **kw):
         qcontext = self.get_auth_signup_qcontext()
@@ -47,10 +80,24 @@ class AuthSignupHome(Home):
                 user_sudo = User.sudo().search(
                     User._get_login_domain(qcontext.get('login')), order=User._get_login_order(), limit=1
                 )
-                template = request.env.ref('auth_signup.mail_template_user_signup_account_created', raise_if_not_found=False)
-                if user_sudo and template:
-                    template.sudo().send_mail(user_sudo.id, force_send=True)
-                return self.web_login(*args, **kw)
+                if not qcontext.get('otp_email_verification_enabled'):
+                    template = request.env.ref('auth_signup.mail_template_user_signup_account_created', raise_if_not_found=False)
+                    if user_sudo and template:
+                        template.sudo().send_mail(user_sudo.id, force_send=True)
+                else:
+                    template = request.env.ref('auth_signup.mail_template_user_otp_verification',
+                                               raise_if_not_found=True)
+                    if user_sudo and template:
+                        # email_values = {'otp': user_sudo.otp}
+                        # body_html = template.sudo()['body_html']
+                        # body_html = body_html.replace('******', str(randint(100000, 999999)))
+                        # template.sudo().send_mail(user_sudo.id, force_send=True, email_values={"body_html": body_html})
+                        user_sudo.write({'otp_code': str(randint(100000, 999999))})
+                        template.sudo().send_mail(user_sudo.id, force_send=True)
+
+                return request.redirect_query('/web/email-verification?%s' % url_encode({'login': qcontext.get('login')}))
+
+                # return self.web_login(*args, **kw)
             except UserError as e:
                 qcontext['error'] = e.args[0]
             except (SignupError, AssertionError) as e:
@@ -65,7 +112,7 @@ class AuthSignupHome(Home):
             if user:
                 return request.redirect('/web/login?%s' % url_encode({'login': user.login, 'redirect': '/web'}))
 
-        response = request.render('auth_signup.signup', qcontext)
+        response = request.render('auth_signup.signup')
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
         return response
@@ -112,10 +159,12 @@ class AuthSignupHome(Home):
         """retrieve the module config (which features are enabled) for the login page"""
 
         get_param = request.env['ir.config_parameter'].sudo().get_param
+        # TODO : need to add flag into setting for otp email verification
         return {
             'disable_database_manager': not tools.config['list_db'],
             'signup_enabled': request.env['res.users']._get_signup_invitation_scope() == 'b2c',
             'reset_password_enabled': get_param('auth_signup.reset_password') == 'True',
+            'otp_email_verification_enabled': "True",
         }
 
     def get_auth_signup_qcontext(self):
@@ -156,9 +205,10 @@ class AuthSignupHome(Home):
     def _signup_with_values(self, token, values):
         login, password = request.env['res.users'].sudo().signup(values, token)
         request.env.cr.commit()     # as authenticate will use its own cursor we need to commit the current transaction
-        pre_uid = request.session.authenticate(request.db, login, password)
-        if not pre_uid:
-            raise SignupError(_('Authentication Failed.'))
+        # TODO : need to stop generate session and move after otp verify
+        # pre_uid = request.session.authenticate(request.db, login, password)
+        # if not pre_uid:
+        #     raise SignupError(_('Authentication Failed.'))
 
 class AuthBaseSetup(BaseSetup):
     @http.route('/base_setup/data', type='json', auth='user')

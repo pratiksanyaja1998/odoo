@@ -14,6 +14,7 @@ from odoo.tools.misc import ustr
 
 from odoo.addons.base.models.ir_mail_server import MailDeliveryException
 from odoo.addons.auth_signup.models.res_partner import SignupError, now
+from random import randint, randrange
 
 _logger = logging.getLogger(__name__)
 
@@ -22,6 +23,17 @@ class ResUsers(models.Model):
 
     state = fields.Selection(compute='_compute_state', search='_search_state', string='Status',
                  selection=[('new', 'Never Connected'), ('active', 'Confirmed')])
+
+    # @api.model
+    # def _get_new_otp_code(self):
+    #     return randint(100000, 999999)
+
+    otp_code = fields.Char(string="OTP")
+
+    @api.model
+    def create(self, vals):
+        # code...............
+        return super(ResUsers, self).create(vals)
 
     def _search_state(self, operator, value):
         negative = operator in expression.NEGATIVE_TERM_OPERATORS

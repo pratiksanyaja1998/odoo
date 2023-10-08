@@ -7,6 +7,10 @@ from odoo import fields, models
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
+    auth_signup_otp_verification = fields.Boolean(
+        string='Enable OTP verification on Signup',
+        config_parameter='auth_signup.otp_verification')
+
     auth_signup_reset_password = fields.Boolean(
         string='Enable password reset from Login page',
         config_parameter='auth_signup.reset_password')

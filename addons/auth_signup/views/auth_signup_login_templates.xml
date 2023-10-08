@@ -103,4 +103,49 @@
 
             </t>
         </template>
+
+        <template id="auth_signup.otp_verification" name="Verify Email OTP">
+            <t t-call="web.login_layout">
+                <div t-if="message" class="oe_login_form clearfix">
+                    <p class="alert alert-success" t-if="message" role="status">
+                        <t t-esc="message"/>
+                    </p>
+                </div>
+
+                <form class="oe_reset_password_form" role="form" method="post" t-if="not message">
+                  <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                  <input type="hidden" name="login" t-att-value="login"/>
+
+<!--                    <t t-if="token and not invalid_token">-->
+<!--                        <t t-call="auth_signup.fields">-->
+<!--                            <t t-set="only_passwords" t-value="1"/>-->
+<!--                        </t>-->
+<!--                    </t>-->
+
+                    <t t-if="not token">
+                        <div class="mb-3 field-login">
+                            <label for="login" class="col-form-label">Email OTP</label>
+                            <input type="number" name="otp" t-att-value="otp" id="otp" class="form-control"
+                                autofocus="autofocus" required="required" autocapitalize="off"/>
+                        </div>
+                    </t>
+
+                    <p class="alert alert-danger" t-if="error" role="alert">
+                        <t t-esc="error"/>
+                    </p>
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+                    <input type="hidden" name="token" t-att-value="token"/>
+                    <div class="clearfix oe_login_buttons d-grid mt-3">
+                        <button type="submit" class="btn btn-primary">Verify OTP</button>
+                        <div class="d-flex justify-content-between align-items-center small mt-2">
+<!--                            <a t-if="not token" t-attf-href="/web/login?{{ keep_query() }}">Back to Login</a>-->
+<!--                            <a t-if="invalid_token" href="/web/login">Back to Login</a>-->
+                        </div>
+                        <div class="o_login_auth"/>
+                    </div>
+
+                </form>
+
+            </t>
+        </template>
 </odoo>
