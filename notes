@@ -3,4 +3,15 @@ Admin or Master Password
 admin@gmail.com
 admin@123
 
+Addons Path
+=============
 addons_path = /Users/psanyaja/Workspace/Odoo/odoo-16/odoo/addons,/Users/psanyaja/Workspace/Odoo/odoo-16/addons,/Users/psanyaja/Workspace/Odoo/odoo-16/dev-addons
+
+
+Custom Development Commands
+============================
+-c local.conf --dev xml = Realtime changes on xml file
+-d {db_name} -u {module_name} = Upgrade module on db
+-c local.conf --dev xml -d odoo-dev -u tenthspire_hospital_system
+
+ -d odoo-dev -u auth_signup

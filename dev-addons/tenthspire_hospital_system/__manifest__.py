@@ -3,5 +3,15 @@
 
 {
     'name': 'TenthSpire Hospital System',
-    'description': 'TenthSpire Hospital System',
+    'description': 'TenthSpire hospital system',
+    'website': 'https://www.tenthspire.com',
+    'author': 'TethSpire Technology',
+    'depends': [
+        'base_setup',
+        'mail',
+        'web',
+    ],
+    'data': [
+        'views/auth_signup_login_templates.xml',
+    ],
 }
