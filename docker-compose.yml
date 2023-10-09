@@ -1,6 +1,6 @@
 version: '3.3'
 services:
-  odoo-db:
+  odoo-dev-db:
     image: postgres:12-alpine
     environment:
       - POSTGRES_PASSWORD=1234

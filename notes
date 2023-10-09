@@ -1,7 +1,8 @@
 Admin or Master Password
 ===============
-admin@gmail.com
-admin@123
+Email: admin@gmail.com
+Password: admin@123
+
 
 Addons Path
 =============
@@ -15,3 +16,5 @@ Custom Development Commands
 -c local.conf --dev xml -d odoo-dev -u tenthspire_hospital_system
 
  -d odoo-dev -u auth_signup
+
+ --dev xml -d odoo -u auth_signup
