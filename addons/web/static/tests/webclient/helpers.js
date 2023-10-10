@@ -5,7 +5,6 @@ import { notificationService } from "@web/core/notifications/notification_servic
 import { ormService } from "@web/core/orm_service";
 import { popoverService } from "@web/core/popover/popover_service";
 import { registry } from "@web/core/registry";
-import { legacyServiceProvider } from "@web/legacy/legacy_service_provider";
 import { viewService } from "@web/views/view_service";
 import { actionService } from "@web/webclient/actions/action_service";
 import { effectService } from "@web/core/effects/effect_service";
@@ -64,7 +63,6 @@ export function setupWebClientRegistries() {
         field: () => fieldService,
         hotkey: () => hotkeyService,
         http: () => makeFakeHTTPService(),
-        legacy_service_provider: () => legacyServiceProvider,
         localization: () => makeFakeLocalizationService(),
         menu: () => menuService,
         name: () => nameService,
@@ -344,7 +342,7 @@ export function getActionManagerServerData() {
       <header></header>
       <sheet>
       <div class="oe_button_box" name="button_box">
-      <button class="oe_stat_button" type="action" name="1" icon="fa-star" context="{'default_partner': active_id}">
+      <button class="oe_stat_button" type="action" name="1" icon="fa-star" context="{'default_partner': id}">
       <field string="Partners" name="o2m" widget="statinfo"/>
       </button>
       </div>
